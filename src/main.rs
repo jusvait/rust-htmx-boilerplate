@@ -1,11 +1,15 @@
 mod error;
 mod index;
+mod serve_static;
+use crate::serve_static::serve_static;
 
 use axum::{Router, routing::get};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let app = Router::new().route("/", get(index::index));
+    let app = Router::new()
+        .route("/", get(index::index))
+        .merge(serve_static());
 
     match tokio::net::TcpListener::bind("0.0.0.0:3000").await {
         Ok(listener) => axum::serve(listener, app).await.unwrap(),
